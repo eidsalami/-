@@ -88,27 +88,6 @@
         }
         .winner-toast.show { opacity: 1; bottom: 40px; }
 
-        .gift-wrapper {
-            width: 120px; height: 120px; margin: 20px auto;
-            cursor: pointer; position: relative;
-        }
-        .box-body {
-            width: 100%; height: 80px; background: #be123c;
-            border-radius: 10px; position: absolute; bottom: 0;
-        }
-        .box-lid {
-            width: 110%; height: 30px; background: #e11d48;
-            position: absolute; top: 10px; left: -5%;
-            border-radius: 5px; transition: 0.5s; z-index: 2;
-        }
-        .open .box-lid { transform: translateY(-40px) rotate(-10deg); opacity: 0; }
-        .money-reveal {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            font-size: 1.8rem; font-weight: 800; color: var(--gold);
-            opacity: 0; transition: 0.5s;
-        }
-        .open .money-reveal { opacity: 1; transform: translate(-50%, -60px); }
-
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); display: none;
@@ -116,8 +95,31 @@
         }
         .modal-content {
             background: var(--deep-green); padding: 30px; border-radius: 20px;
-            border: 2px solid var(--gold); text-align: center; width: 90%; max-width: 380px;
+            border: 2px solid var(--gold); text-align: center; width: 90%; max-width: 400px;
         }
+
+        .share-buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .gift-wrapper {
+            width: 120px; height: 120px; margin: 20px auto;
+            cursor: pointer; position: relative;
+        }
+        .box-body {
+            width: 100%; height: 80px; background: #be123c; border-radius: 10px; position: absolute; bottom: 0;
+        }
+        .box-lid {
+            width: 110%; height: 30px; background: #e11d48; position: absolute; top: 10px; left: -5%; border-radius: 5px; transition: 0.5s; z-index: 2;
+        }
+        .open .box-lid { transform: translateY(-40px) rotate(-10deg); opacity: 0; }
+        .money-reveal {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 1.8rem; font-weight: 800; color: var(--gold); opacity: 0; transition: 0.5s;
+        }
+        .open .money-reveal { opacity: 1; transform: translate(-50%, -60px); }
 
         .hidden { display: none; }
     </style>
@@ -150,7 +152,6 @@
                     <i class="fa-solid fa-gift"></i> আমার সালামি নিন
                 </button>
                 
-                <!-- বন্ধুকে পাঠান বাটন (এখানে কোনো অ্যাড লিঙ্ক নেই) -->
                 <button class="btn-gold" onclick="shareToMessenger()" style="background: #0084FF;">
                     <i class="fa-brands fa-facebook-messenger"></i> বন্ধুকে সালামি পাঠান
                 </button>
@@ -165,10 +166,14 @@
             <p style="margin: 10px 0; font-size: 0.9rem;">সালামি পেতে হলে প্রথমে ২ বার শেয়ার করতে হবে!</p>
             <div id="s-count" style="font-size: 1.5rem; color: var(--gold); font-weight: 800; margin: 10px 0;">0 / 2</div>
 
-            <!-- শেয়ার বাটন (অ্যাড লিঙ্ক সহ) -->
-            <button class="btn-gold" onclick="doShare()" style="background: #25D366;">
-                <i class="fa-brands fa-whatsapp"></i> শেয়ার করুন
-            </button>
+            <div class="share-buttons-container">
+                <button class="btn-gold" onclick="doShare('wa')" style="background: #25D366;">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-gold" onclick="doShare('ms')" style="background: #0084FF;">
+                    <i class="fa-brands fa-facebook-messenger"></i> Messenger
+                </button>
+            </div>
 
             <div id="gift-box-area" class="hidden">
                 <p style="margin-top: 20px;">অভিনন্দন! এবার আপনার বক্সটি খুলুন।</p>
@@ -187,7 +192,6 @@
         const winners = ["আবির", "সুমাইয়া", "রাহাত", "মিতু", "সোহেল", "রিয়া", "তানজিল", "ইশতিয়াক", "নুসরাত", "জাহিদ"];
         const amounts = [100, 200, 500, 1000, 1500, 2000];
 
-        // URL চেক করে প্রেরকের নাম বসানো
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const sender = urlParams.get('ref');
@@ -196,7 +200,6 @@
             }
         };
 
-        // ব্যাকগ্রাউন্ড তারা
         const starsContainer = document.getElementById('stars');
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
@@ -231,13 +234,25 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // এই ফাংশনটি অ্যাড ওপেন করবে এবং কাউন্ট বাড়াবে
-        function doShare() {
-            window.open(AD_LINK, '_blank');
+        // শেয়ার করার মূল ফাংশন
+        function doShare(platform) {
+            const myName = document.getElementById('name').value || "আপনার বন্ধু";
+            const shareUrl = window.location.origin + window.location.pathname + "?ref=" + encodeURIComponent(myName);
+            const shareText = `${myName} আপনাকে ঈদ সালামি পাঠিয়েছে! সংগ্রহ করতে নিচের লিঙ্কে ক্লিক করুন: \n${shareUrl}`;
+
+            if(platform === 'wa') {
+                window.open(AD_LINK, '_blank'); // হোয়াটসঅ্যাপে ক্লিক করলে অ্যাড খুলবে
+                window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(shareText), "_blank");
+            } else {
+                // মেসেঞ্জারে ক্লিক করলে সরাসরি অ্যাপ খুলবে
+                window.location.href = "fb-messenger://share/?link=" + encodeURIComponent(shareUrl);
+            }
+
             shares++;
             document.getElementById('s-count').innerText = shares + " / 2";
             if(shares >= 2) {
                 document.getElementById('gift-box-area').classList.remove('hidden');
+                document.getElementById('s-count').style.color = "#22c55e";
             }
         }
 
@@ -253,24 +268,11 @@
             }, 2000);
         }
 
-        // মেসেঞ্জার শেয়ার ফাংশন (কোনো অ্যাড লিঙ্ক নেই)
+        // মেইন ইউআই এর মেসেঞ্জার বাটন
         function shareToMessenger() {
             const myName = document.getElementById('name').value || "আপনার বন্ধু";
-            // বর্তমান সাইটের লিঙ্ক তৈরি (Referral সহ)
             const shareUrl = window.location.origin + window.location.pathname + "?ref=" + encodeURIComponent(myName);
-            
-            // মোবাইল মেসেঞ্জার শেয়ার লিঙ্ক
-            const messengerUrl = "fb-messenger://share/?link=" + encodeURIComponent(shareUrl);
-            
-            // সরাসরি মেসেঞ্জার ওপেন করার চেষ্টা
-            window.location.href = messengerUrl;
-
-            // যদি মেসেঞ্জার অ্যাপ না থাকে তার জন্য ফলব্যাক ব্যবস্থা
-            setTimeout(() => {
-                if (confirm("মেসেঞ্জার অ্যাপটি সরাসরি না খুললে, আপনি কি ব্রাউজার থেকে শেয়ার করতে চান?")) {
-                    window.open("https://www.facebook.com/dialog/send?link=" + encodeURIComponent(shareUrl) + "&app_id=291494419107518&redirect_uri=" + encodeURIComponent(shareUrl), "_blank");
-                }
-            }, 1000);
+            window.location.href = "fb-messenger://share/?link=" + encodeURIComponent(shareUrl);
         }
     </script>
 </body>
